@@ -1,0 +1,17 @@
+LICENSE.txt
+MANIFEST.in
+README.rst
+setup.py
+ijson/__init__.py
+ijson/common.py
+ijson/compat.py
+ijson/utils.py
+ijson.egg-info/PKG-INFO
+ijson.egg-info/SOURCES.txt
+ijson.egg-info/dependency_links.txt
+ijson.egg-info/top_level.txt
+ijson/backends/__init__.py
+ijson/backends/python.py
+ijson/backends/yajl.py
+ijson/backends/yajl2.py
+ijson/backends/yajl2_cffi.py
