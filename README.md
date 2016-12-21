@@ -22,10 +22,10 @@ It doesn't work too great at the moment, but the source is simple so hopefully i
 ## What works
 
 - Cross-file lookup. All the project `*.swift` files are passed as arguments to the compiler arguments of SourceKitten.
+- Autocomplete on un-saved files
 
 ## Needs fixing
 
-- Autocomplete doesn't work on un-saved files (this probably isn't useful until this is fixed)
 - Use xcodeproj file for project files when available
 - Work out how to make it compatible with imported Frameworks
 - Speed up
