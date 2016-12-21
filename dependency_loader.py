@@ -7,3 +7,5 @@ import sys, os
 for package in dependencies:
     path = os.path.join(os.path.dirname(__file__), "dependencies", package)
     sys.path.append(path)
+
+sys.path.append((os.path.join(os.path.dirname(__file__), "lib")))
