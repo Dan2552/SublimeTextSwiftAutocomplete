@@ -2,7 +2,7 @@
 
 This project is an attempt at adding Swift autocomplete into Sublime Text 3, using [SourceKitten](https://github.com/jpsim/SourceKitten).
 
-It currently works okayish on smaller projects (e.g. [branch](https://github.com/Dan2552/branch), but the source of SourceKittenSubl is simple so hopefully it should be easy to contribute to. I'm open for discussion on the repository issues.
+It currently works okayish on smaller projects (e.g. [branch](https://github.com/Dan2552/branch)), but the source of SourceKittenSubl is simple so hopefully it should be easy to contribute to. I'm open for discussion on the repository issues.
 
 ## Installation
 
