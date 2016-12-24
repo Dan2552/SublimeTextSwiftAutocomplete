@@ -15,7 +15,7 @@ class TestSublSourceKitten(unittest.TestCase):
     # Formatted as a sublime autocomplete
     def test_complete_simple(self):
         offset = 121
-        project_directory = path_helper.data_directory() + "/MonkeyExample"
+        project_directory = path_helper.monkey_example_directory()
         file = project_directory + "/Monkey.swift"
         text = file_contents_helper.read(file)
         output = subl_source_kitten.complete(offset, file, project_directory, text)

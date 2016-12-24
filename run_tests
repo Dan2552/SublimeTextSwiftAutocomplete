@@ -4,8 +4,13 @@ script_dir=$( cd "$( dirname "$0" )" && pwd )
 cd $script_dir/test
 clear
 
+files=$1
+if [[ $files == "" ]]; then
+  files="$(ls *_test.py | sed -e 's/\..*$//')"
+fi
+
 # Run
-python3 -m unittest helpers/test_helper.py $(ls *_test.py | sed -e 's/\..*$//')
+python3 -m unittest helpers/test_helper.py $files
 
 cd $script_dir
 
