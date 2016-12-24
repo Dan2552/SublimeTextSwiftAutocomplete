@@ -16,5 +16,8 @@ def source_files(project_directory):
 # - returns: List
 def _source_files_from_simple_pattern_matching(project_directory):
     cmd = "find " + project_directory + " -name '*.swift'"
-    rows = popen(cmd, "r").readlines()
+    process = popen(cmd, "r")
+    rows = process.readlines()
+    rows = map(lambda x: x.replace("\n", ""), rows)
+    process.close()
     return rows

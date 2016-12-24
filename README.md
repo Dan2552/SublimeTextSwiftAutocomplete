@@ -2,7 +2,7 @@
 
 This project is an attempt at adding Swift autocomplete into Sublime Text 3, using [SourceKitten](https://github.com/jpsim/SourceKitten).
 
-It doesn't work too great at the moment, but the source is simple so hopefully it should be easy to contribute to. I'm open for discussion on the repository issues.
+It currently works okayish on smaller projects (e.g. [branch](https://github.com/Dan2552/branch), but the source of SourceKittenSubl is simple so hopefully it should be easy to contribute to. I'm open for discussion on the repository issues.
 
 ## Installation
 
@@ -15,9 +15,13 @@ It doesn't work too great at the moment, but the source is simple so hopefully i
 
 ## How it works
 
-- `main.py`: this file is entry point to the application - `on_query_completions` is an event handler method provided by Sublime Text's API, so Sublime Text will call the method when attempting to autocomplete.
+- `subl.py`: this file is entry point to the plugin from Sublime - `on_query_completions` is an event handler method provided by Sublime Text's API, so Sublime Text will call the method when attempting to autocomplete.
 - `subl_source_kitten.py` is purely to convert output from SourceKitten into Sublime autocompletions.
 - `source_kitten.py` communicates with the `sourcekitten` - exactly in the same way as you would from a bash shell. Parses the output from JSON into Python objects.
+- `swift_project.py` deals with the "project" (i.e. which source files should be passed in to SourceKitten)
+
+## Running tests
+- Run the test runner: `./run_tests`
 
 ## What works
 
@@ -30,4 +34,3 @@ It doesn't work too great at the moment, but the source is simple so hopefully i
 - Work out how to make it compatible with imported Frameworks
 - Speed up
 - Unhardcode SDK and target
-- Cleanup debug `print` calls

@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+script_dir=$( cd "$( dirname "$0" )" && pwd )
+cd $script_dir/test
+clear
+
+# Run
+python3 -m unittest helpers/test_helper.py $(ls *_test.py | sed -e 's/\..*$//')
+
+cd $script_dir
+
+# Cleanup
+find -d . | grep "__pycache__$" | xargs rm -rf
