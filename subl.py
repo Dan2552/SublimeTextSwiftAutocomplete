@@ -10,8 +10,10 @@ class SublCompletions(sublime_plugin.EventListener):
     def on_query_completions(self, view, prefix, locations):
         offset = locations[0]
         file = view.file_name()
-        if not file.endswith(".swift"):
+
+        if file != None and not file.endswith(".swift"):
             return None
+
         project_directory = view.window().folders()[0]
         text = view.substr(Region(0, view.size()))
         suggestions = subl_source_kitten.complete(offset, file, project_directory, text)
