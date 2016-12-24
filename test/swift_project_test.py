@@ -6,7 +6,7 @@ class TestSourceKitten(unittest.TestCase):
     # Test with a simple project directory
     # (i.e. without xcodeproj)
     def test_source_files_simple_project(self):
-        project_directory = path_helper.data_directory() + "/MonkeyExample"
+        project_directory = path_helper.monkey_example_directory()
 
         output = swift_project.source_files(project_directory)
 

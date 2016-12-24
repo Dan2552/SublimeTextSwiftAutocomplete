@@ -15,7 +15,7 @@ class TestSourceKitten(unittest.TestCase):
     # Formatted as a sublime autocomplete
     def test_complete_simple(self):
         offset = 121
-        project_directory = path_helper.data_directory() + "/MonkeyExample"
+        project_directory = path_helper.monkey_example_directory()
         file = project_directory + "/Monkey.swift"
         text = file_contents_helper.read(file)
         output = source_kitten.complete(offset, file, project_directory, text)
@@ -35,8 +35,8 @@ class TestSourceKitten(unittest.TestCase):
     #
     # (i.e. test to ensure unsaved autocomplete is working ok)
     def test_changed_code_on_unsaved(self):
-        offset = 161
-        project_directory = path_helper.data_directory() + "/MonkeyExample"
+        offset = 162
+        project_directory = path_helper.monkey_example_directory()
         file = project_directory + "/Monkey.swift"
         text = file_contents_helper.read(file)
         output = source_kitten.complete(offset, file, project_directory, text)
@@ -49,3 +49,41 @@ class TestSourceKitten(unittest.TestCase):
         text = text.replace("consumedBananas", "consumedBananaz", 1)
         output = source_kitten.complete(offset, file, project_directory, text)
         self.assertTrue(len(output) > 0)
+
+    # Midword completions. e.g:
+    #
+    # print("Eating the \(banana.co
+    #                             ^
+    def test_midword(self):
+        offset = 123
+
+        project_directory = path_helper.monkey_example_directory()
+        file = project_directory + "/Monkey.swift"
+        text = file_contents_helper.read(file)
+        output = source_kitten.complete(offset, file, project_directory, text)
+
+        self.assertTrue(len(output) > 0)
+        self.assertEqual(output[0]["name"], "color")
+        self.assertEqual(output[0]["typeName"], "String")
+
+    # There's not always a `.` preceeding a possible autocomplete
+    #
+    # struct Banana {
+    #     let color: Strin
+    #                    ^
+    def test_midword_type(self):
+        offset = 36
+
+        project_directory = path_helper.monkey_example_directory()
+        file = project_directory + "/Banana.swift"
+        text = file_contents_helper.read(file)
+        output = source_kitten.complete(offset, file, project_directory, text)
+
+        self.assertTrue(len(output) > 0)
+
+        found_string_as_autocomplete = False
+        for entry in output:
+            if entry["name"] == "String" and entry["typeName"] == "String":
+                found_string_as_autocomplete = True
+
+        self.assertTrue(found_string_as_autocomplete)
