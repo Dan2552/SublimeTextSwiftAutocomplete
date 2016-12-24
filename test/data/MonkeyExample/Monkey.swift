@@ -5,4 +5,8 @@ class Monkey {
         print("Eating the \(banana.color) banana")
         consumedBananas.append(banana)
     }
+
+    func give(banana: Banana, toMonkey monkey: Monkey) {
+        // ...
+    }
 }
