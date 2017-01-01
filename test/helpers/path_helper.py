@@ -8,3 +8,6 @@ def monkey_example_directory():
 
 def xcode_example_project():
     return data_directory() + "/iOSProject/Example.xcodeproj"
+
+def spaced_example_directory():
+    return data_directory() + "/Spaces"

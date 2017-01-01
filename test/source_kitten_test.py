@@ -87,3 +87,13 @@ class TestSourceKitten(unittest.TestCase):
                 found_string_as_autocomplete = True
 
         self.assertTrue(found_string_as_autocomplete)
+
+    # Test project with spaces in subdirectory name
+    def test_spaced_project(self):
+        project_directory = path_helper.spaced_example_directory()
+        file = ""
+        text = "\"\"."
+        offset = 3
+        output = source_kitten.complete(offset, file, project_directory, text)
+
+        self.assertTrue(len(output) > 0)

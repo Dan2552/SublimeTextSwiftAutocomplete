@@ -7,6 +7,7 @@ import swift_project
 def complete(offset, file, project_directory, text):
     source_files = swift_project.source_files(project_directory)
     source_files = _filter_file_from_list(file, source_files)
+    source_files = map(_escape_spaces, source_files)
 
     offset = _calculate_source_kitten_compatible_offset(offset, text)
 
@@ -39,6 +40,9 @@ def complete(offset, file, project_directory, text):
 # SourceKitten
 def _filter_file_from_list(file, source_files):
     return filter(lambda x: x != file, source_files)
+
+def _escape_spaces(str):
+    return str.replace(" ", "\ ")
 
 # If you try to autocomplete midword, SourceKitten returns no results, so this
 # function will calculate an offset that will potentially return results
