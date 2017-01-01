@@ -29,6 +29,8 @@ def complete(offset, file, project_directory, text):
           arg_target + \
           arg_files
 
+    print(cmd)
+
     with Popen(cmd, shell=True, stdout=PIPE, stderr=STDOUT) as p:
       try:
           results = list(ijson.items(p.stdout,''))[0]
@@ -63,17 +65,21 @@ def _calculate_source_kitten_compatible_offset(offset, text):
       text = text[(semicolon_index + 1):len(text)]
       trimmed_off_left = trimmed_off_left + semicolon_index + 1
 
+    open_brackets_location = text.rfind("(", 0, len(text))
+    close_brackets_location = text.rfind(")", 0, len(text))
     last_dot_location = text.rfind(".", 0, len(text))
     last_space_location = text.rfind(" ", 0, len(text))
 
-
-    if last_dot_location > last_space_location:
+    # If there's an open bracket it's ahead of dots or spaces, autocorrect there
+    if (open_brackets_location > close_brackets_location) and (open_brackets_location > last_dot_location) and (open_brackets_location > last_space_location):
+         offset = trimmed_off_left + open_brackets_location + 1
+    elif last_dot_location > last_space_location:
         offset = trimmed_off_left + last_dot_location + 1
     elif last_space_location > -1:
         offset = trimmed_off_left + last_space_location + 1
 
     # # Uncomment for some really useful debug printing:
-    # print("\n" + text)
-    # print(((offset - trimmed_off_left - 1) * " ") + "^")
+    print("\n" + text)
+    print(((offset - trimmed_off_left - 1) * " ") + "^")
 
     return offset

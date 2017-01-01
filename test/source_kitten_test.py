@@ -97,3 +97,25 @@ class TestSourceKitten(unittest.TestCase):
         output = source_kitten.complete(offset, file, project_directory, text)
 
         self.assertTrue(len(output) > 0)
+
+    # Tests that:
+    #
+    # Banana(
+    #       ^
+    # and
+    #
+    # let banana = Banana(
+    #                    ^
+    #
+    # both work
+    def test_inits(self):
+        project_directory = path_helper.monkey_example_directory()
+
+        text = "Banana("
+        output1 = source_kitten.complete(len(text), "", project_directory, text)
+        text = "let banana = Banana("
+        output2 = source_kitten.complete(len(text), "", project_directory, text)
+
+        self.assertEqual(output1[0]['name'], "color:flavor:)")
+        self.assertEqual(output2[0]['name'], "color:flavor:)")
+
