@@ -6,7 +6,7 @@ While it doesn't read Xcode project files, it currently works pretty well for me
 
 ## Installation
 
-- Install SwiftKitten (`brew install sourcekitten`)
+- Install SourceKitten (`brew install sourcekitten`)
 - Clone this repository to the Sublime packages directory
 
 ## Usage
