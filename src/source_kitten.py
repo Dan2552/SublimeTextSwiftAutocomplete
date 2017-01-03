@@ -3,23 +3,27 @@ from subprocess import Popen, PIPE, STDOUT
 import ijson
 import shlex
 import swift_project
+import cached_invoke
 
 def complete(offset, file, project_directory, text):
     source_files = swift_project.source_files(project_directory)
     source_files = _filter_file_from_list(file, source_files)
     source_files = map(_escape_spaces, source_files)
 
-    offset = _calculate_source_kitten_compatible_offset(offset, text)
+    calculated_offset = _calculate_source_kitten_compatible_offset(offset, text)
+    text = _cut_calculated_offset_difference(offset, calculated_offset, text)
 
+    cached_invoke_cmd = _escape_spaces(cached_invoke.executable_path()) + " 5 "
     navigate_to_project = "cd " + project_directory
     command = " sourcekitten complete"
     arg_file = " --text " + shlex.quote(text)
-    arg_offset = " --offset " + str(offset)
+    arg_offset = " --offset " + str(calculated_offset)
     arg_sdk = " -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator10.2.sdk"
     arg_target = " -target x86_64-apple-ios9.0"
     arg_files = " " + " ".join(source_files)
 
-    cmd = navigate_to_project + \
+    cmd = cached_invoke_cmd + \
+          navigate_to_project + \
           " &&" + \
           command + \
           arg_file + \
@@ -77,3 +81,10 @@ def _calculate_source_kitten_compatible_offset(offset, text):
     # print(((offset - trimmed_off_left - 1) * " ") + "^")
 
     return offset
+
+# By cutting the offset difference, the same command will be triggered to
+# SourceKitten which will then take advantage of cached_invoke
+def _cut_calculated_offset_difference(offset, calculated_offset, text):
+    left = text[0:calculated_offset]
+    right = text[offset:len(text)]
+    return left + right
