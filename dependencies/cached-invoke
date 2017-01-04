@@ -30,6 +30,7 @@ if [[ $? == 0 ]]; then
   fi
 fi
 
-$cmd >$filename 2>&1
+eval "$cmd" >$filename 2>&1
+
 cat $filename
-$script_dir/cached-invoke $delay clean &
+"$script_dir/cached-invoke" $delay clean &

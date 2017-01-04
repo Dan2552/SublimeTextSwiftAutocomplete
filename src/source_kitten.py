@@ -13,19 +13,15 @@ def complete(offset, file, project_directory, text):
     calculated_offset = _calculate_source_kitten_compatible_offset(offset, text)
     text = _cut_calculated_offset_difference(offset, calculated_offset, text)
 
-    cached_invoke_cmd = _escape_spaces(cached_invoke.executable_path()) + " 5 "
-    navigate_to_project = "cd " + project_directory
-    command = " sourcekitten complete"
+    cached_invoke_cmd = cached_invoke.executable_path()
+    command = "sourcekitten complete"
     arg_file = " --text " + shlex.quote(text)
     arg_offset = " --offset " + str(calculated_offset)
     arg_sdk = " -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator10.2.sdk"
     arg_target = " -target x86_64-apple-ios9.0"
     arg_files = " " + " ".join(source_files)
 
-    cmd = cached_invoke_cmd + \
-          navigate_to_project + \
-          " &&" + \
-          command + \
+    cmd = command + \
           arg_file + \
           arg_offset + \
           " --" + \
@@ -33,7 +29,7 @@ def complete(offset, file, project_directory, text):
           arg_target + \
           arg_files
 
-    with Popen(cmd, shell=True, stdout=PIPE, stderr=STDOUT) as p:
+    with Popen([cached_invoke_cmd, "10", cmd], stdout=PIPE, stderr=STDOUT) as p:
       try:
           results = list(ijson.items(p.stdout,''))[0]
           return results
