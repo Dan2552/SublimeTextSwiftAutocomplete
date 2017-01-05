@@ -1,48 +1,50 @@
 import subprocess
 from subprocess import Popen, PIPE, STDOUT
 import ijson
-import shlex
 import swift_project
-import cached_invoke
+import functools
 
 def complete(offset, file, project_directory, text):
-    source_files = swift_project.source_files(project_directory)
-    source_files = _filter_file_from_list(file, source_files)
-    source_files = map(_escape_spaces, source_files)
-
     calculated_offset = _calculate_source_kitten_compatible_offset(offset, text)
     text = _cut_calculated_offset_difference(offset, calculated_offset, text)
 
-    cached_invoke_cmd = cached_invoke.executable_path()
-    command = "sourcekitten complete"
-    arg_file = " --text " + shlex.quote(text)
-    arg_offset = " --offset " + str(calculated_offset)
-    arg_sdk = " -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator10.2.sdk"
-    arg_target = " -target x86_64-apple-ios9.0"
-    arg_files = " " + " ".join(source_files)
+    cmd = [
+        "sourcekitten",
+        "complete",
+        "--text", text,
+        "--offset", str(calculated_offset),
+        "--",
+        "-sdk", "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator10.2.sdk",
+        "-target", "x86_64-apple-ios9.0"
+    ] + list(_source_files(file, project_directory))
 
-    cmd = command + \
-          arg_file + \
-          arg_offset + \
-          " --" + \
-          arg_sdk + \
-          arg_target + \
-          arg_files
+    # Converting to a string and back is a little hack to let lru_cache work
+    output = _execute("§".join(cmd), _json_parse)
+    return output
 
-    with Popen([cached_invoke_cmd, "10", cmd], stdout=PIPE, stderr=STDOUT) as p:
-      try:
-          results = list(ijson.items(p.stdout,''))[0]
-          return results
-      except ijson.backends.python.UnexpectedSymbol:
-          return []
+@functools.lru_cache(maxsize=None)
+def _execute(cmd, result_handler):
+    cmd = cmd.split("§")
+    with Popen(cmd, stdout=PIPE, stderr=STDOUT) as p:
+        result = result_handler(p.stdout)
+    return result
+
+def _json_parse(stdout):
+    try:
+        results = list(ijson.items(stdout,''))[0]
+        return results
+    except ijson.backends.python.UnexpectedSymbol:
+        return []
+
+def _source_files(file, project_directory):
+    source_files = swift_project.source_files(project_directory)
+    source_files = _filter_file_from_list(file, source_files)
+    return source_files
 
 # When a file is unsaved, you don't want the persisted file passed into
 # SourceKitten
 def _filter_file_from_list(file, source_files):
     return filter(lambda x: x != file, source_files)
-
-def _escape_spaces(str):
-    return str.replace(" ", "\ ")
 
 # If you try to autocomplete midword, SourceKitten returns no results, so this
 # function will calculate an offset that will potentially return results
@@ -65,7 +67,6 @@ def _calculate_source_kitten_compatible_offset(offset, text):
 
     last_dot_location = text.rfind(".", 0, len(text))
     last_space_location = text.rfind(" ", 0, len(text))
-
 
     if last_dot_location > last_space_location:
         offset = trimmed_off_left + last_dot_location + 1
