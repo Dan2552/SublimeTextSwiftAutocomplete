@@ -14,8 +14,8 @@ def complete(offset, file, project_directory, text):
         "--text", text,
         "--offset", str(calculated_offset),
         "--",
-        "-sdk", "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator10.2.sdk",
-        "-target", "x86_64-apple-ios9.0"
+        "-sdk", "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk",
+        "-target", "x86_64-apple-ios10.0"
     ] + list(_source_files(file, project_directory))
 
     # Converting to a string and back is a little hack to let lru_cache work

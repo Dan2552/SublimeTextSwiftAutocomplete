@@ -2,6 +2,7 @@ import unittest
 import path_helper
 import file_contents_helper
 import source_kitten
+import time
 
 class TestSourceKitten(unittest.TestCase):
     # Here we test (within the "Monkey" example) that
@@ -97,3 +98,24 @@ class TestSourceKitten(unittest.TestCase):
         output = source_kitten.complete(offset, file, project_directory, text)
 
         self.assertTrue(len(output) > 0)
+
+    # No assertions here, but a printout of how long it takes to autocomplete
+    # with UIKit import
+    def test_performance(self):
+        text = "import UIKit class Testing() { func aFunction() {  } }"
+        offset = 50
+        file = ""
+        project_directory = "/tmp/nowhere/"
+
+        start_time = int(round(time.time() * 1000))
+        source_kitten.complete(offset, file, project_directory, text)
+        end_time = int(round(time.time() * 1000))
+
+        print("source_kitten.complete - Performance test (1st): ", end_time - start_time, 'ms')
+
+        start_time = int(round(time.time() * 1000))
+        source_kitten.complete(offset, file, project_directory, text)
+        end_time = int(round(time.time() * 1000))
+
+        print("source_kitten.complete - Performance test (2nd): ", end_time - start_time, 'ms')
+
