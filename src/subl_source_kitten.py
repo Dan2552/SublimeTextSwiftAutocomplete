@@ -38,7 +38,17 @@ def popup(offset, file, project_directory, text):
 
     return popup_text
 
+def source_location_link(offset, file, project_directory, text):
+    dictionary = source_kitten.cursor_info(offset, file, project_directory, text)
+    href, relative_path_with_offset = _source_location_paths(file, project_directory, dictionary)
+    return href
+
 def _source_location_popup_section(file, project_directory, dictionary):
+    href, relative_path_with_offset = _source_location_paths(file, project_directory, dictionary)
+    value = "<a href=\"" + href + "\">" + relative_path_with_offset + "</a>"
+    return _popup_section("Location", value)
+
+def _source_location_paths(file, project_directory, dictionary):
     filepath = _value_or_empty_string("key.filepath", dictionary)
     offset = _value_or_empty_string("key.offset", dictionary)
     length = _value_or_empty_string("key.length", dictionary)
@@ -54,8 +64,7 @@ def _source_location_popup_section(file, project_directory, dictionary):
     relative_path_with_offset = relative_path + ":1:" + str(offset)
     absolute_path_with_offset = filepath + ":1:" + str(offset)
     href = absolute_path_with_offset + "-" + str(length)
-    value = "<a href=\"" + href + "\">" + relative_path_with_offset + "</a>"
-    return _popup_section("Location", value)
+    return [href, relative_path_with_offset]
 
 def _popup_section_from_dict(title, key, dictionary, xml=None):
     value = _value_or_empty_string(key, dictionary)

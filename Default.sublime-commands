@@ -1,6 +1,4 @@
 [
-  {
-    "caption": "SourceKittenSubl: Show documentation popup",
-    "command": "source_kitten_subl_doc"
-  }
+    { "caption": "SourceKittenSubl: Show documentation popup", "command": "source_kitten_subl_doc" },
+    { "caption": "SourceKittenSubl: Jump to definition", "command": "source_kitten_subl_jump_to_definition" }
 ]

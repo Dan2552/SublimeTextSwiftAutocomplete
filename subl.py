@@ -67,6 +67,18 @@ class SourceKittenSublDocCommand(sublime_plugin.TextCommand):
         point = self.view.sel()[0].begin()
         SublCompletions().on_hover(self.view, point, sublime.HOVER_TEXT)
 
+class SourceKittenSublJumpToDefinitionCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        view = self.view
+        file = view.file_name()
+        point = view.sel()[0].begin()
+        project_directory = _project_directory(view)
+        text = _view_text(view)
+        href = subl_source_kitten.source_location_link(point, file, project_directory, text)
+        instance = SublCompletions()
+        instance.view = view
+        instance.on_navigate(href)
+
 def _project_directory(view):
     if len(view.window().folders()) > 0:
         return view.window().folders()[0]
