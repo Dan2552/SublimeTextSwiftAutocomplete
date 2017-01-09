@@ -40,8 +40,6 @@ def _popupSection(title, key, dictionary, xml=None):
     if not key in dictionary:
         return ""
     value = dictionary[key]
-    print("original:")
-    print(value)
 
     if xml == True:
         value = sourcekit_xml_to_html.to_html(value)

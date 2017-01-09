@@ -89,8 +89,7 @@ def to_html(xml):
         root.remove(el)
 
     converted_xml = str(ElementTree.tostring(root, encoding="utf-8"), "utf-8")
-    print("converted:")
-    print(converted_xml)
+
     return css + converted_xml
 
 # Sublime Text minihtml is a bit delicate. So here we remove tags that prevent
