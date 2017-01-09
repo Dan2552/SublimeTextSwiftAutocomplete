@@ -21,33 +21,63 @@ def complete(offset, file, project_directory, text):
 def popup(offset, file, project_directory, text):
     output = source_kitten.cursor_info(offset, file, project_directory, text)
 
-    name_text = _popupSection("Name", "key.name", output)
-    type_text = _popupSection("Type", "key.typename", output)
-    group_text = _popupSection("Group", "key.groupname", output)
+    name_text = _popup_section_from_dict("Name", "key.name", output)
+    type_text = _popup_section_from_dict("Type", "key.typename", output)
+    group_text = _popup_section_from_dict("Group", "key.groupname", output)
 
-    full_decl = _popupSection("Declaration", "key.doc.full_as_xml", output, True)
-    short_decl = _popupSection("Declaration", "key.annotated_decl", output, True)
+    full_decl = _popup_section_from_dict("Declaration", "key.doc.full_as_xml", output, True)
+    short_decl = _popup_section_from_dict("Declaration", "key.annotated_decl", output, True)
+
+    source_loc_text = _source_location_popup_section(file, project_directory, output)
 
     declaration_text = full_decl
     if len(short_decl) > len(full_decl):
         declaration_text = short_decl
 
-    popup_text = name_text + type_text + declaration_text
+    popup_text = name_text + type_text + source_loc_text + declaration_text
 
     return popup_text
 
-def _popupSection(title, key, dictionary, xml=None):
-    if not key in dictionary:
+def _source_location_popup_section(file, project_directory, dictionary):
+    filepath = _value_or_empty_string("key.filepath", dictionary)
+    offset = _value_or_empty_string("key.offset", dictionary)
+    length = _value_or_empty_string("key.length", dictionary)
+    if filepath == "":
         return ""
-    value = dictionary[key]
+    offset = offset + 1
+
+    # Current file
+    if source_kitten.temp_file_path() in filepath:
+        filepath = file
+
+    relative_path = filepath.replace(project_directory + "/", "")
+    relative_path_with_offset = relative_path + ":1:" + str(offset)
+    absolute_path_with_offset = filepath + ":1:" + str(offset)
+    href = absolute_path_with_offset + "-" + str(length)
+    value = "<a href=\"" + href + "\">" + relative_path_with_offset + "</a>"
+    return _popup_section("Location", value)
+
+def _popup_section_from_dict(title, key, dictionary, xml=None):
+    value = _value_or_empty_string(key, dictionary)
+
+    if value == "":
+        return ""
 
     if xml == True:
         value = sourcekit_xml_to_html.to_html(value)
     else:
         value = "" + cgi.escape(value) + ""
 
+    return _popup_section(title, value)
+
+def _popup_section(title, value):
     value = "<span class='title'>" + title + "</span>" + "<div class='section'>" + value + "</div>"
     return value
+
+def _value_or_empty_string(key, dictionary):
+    if not key in dictionary:
+        return ""
+    return dictionary[key]
 
 # An item will look something like this:
 #

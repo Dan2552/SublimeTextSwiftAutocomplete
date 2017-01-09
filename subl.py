@@ -4,10 +4,12 @@ dependencies.load()
 import sublime, sublime_plugin
 from sublime import Region
 import subl_source_kitten
+from threading import Timer
 
 # Sublime Text will will call `on_query_completions` itself
 class SublCompletions(sublime_plugin.EventListener):
     def on_query_completions(self, view, prefix, locations):
+        self.view = view
         file = view.file_name()
         if not _is_swift(file):
             return None
@@ -19,6 +21,7 @@ class SublCompletions(sublime_plugin.EventListener):
         return (suggestions, sublime.INHIBIT_WORD_COMPLETIONS | sublime.INHIBIT_EXPLICIT_COMPLETIONS)
 
     def on_hover(self, view, point, hover_zone):
+        self.view = view
         file = view.file_name()
         if not _is_swift(file):
             return
@@ -42,7 +45,19 @@ class SublCompletions(sublime_plugin.EventListener):
     def on_navigate(self, url):
         if self.view.is_popup_visible():
             self.view.hide_popup()
-            self.view.window().open_file(url, sublime.ENCODED_POSITION | sublime.TRANSIENT)
+        filepath, line, offsets = url.split(":")
+        column, length = offsets.split("-")
+        new_view = self.view.window().open_file(url, sublime.ENCODED_POSITION)
+
+        start_offset = int(column) - 1
+        end_offset = start_offset + int(length)
+        region = Region(start_offset, end_offset)
+
+        # Add a highlight
+        new_view.add_regions("highlight", [region], "comment")
+
+        # Remove highlight after a second
+        Timer(1.0, lambda: new_view.add_regions("highlight", [], "comment")).start()
 
     def on_hide(self):
         pass

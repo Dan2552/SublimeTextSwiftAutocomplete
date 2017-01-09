@@ -68,6 +68,11 @@ def cursor_info(offset, file, project_directory, text):
     _remove_temp_file()
     return output
 
+# This temp file path is used for unsaved current file requests (excluding the
+# `.complete` function)
+def temp_file_path():
+    return "/tmp/SourceKittenSublTemp.swift"
+
 def _sdk_and_target():
     return [
         "-sdk", _sdk(),
@@ -153,10 +158,10 @@ def _cut_calculated_offset_difference(offset, calculated_offset, text):
     return left + right
 
 def _create_temp_file(text):
-    path = "/tmp/SourceKittenSublTemp.swift"
+    path = temp_file_path()
     with open(path, "w") as text_file:
         text_file.write(text)
     return path
 
 def _remove_temp_file():
-    os.remove("/tmp/SourceKittenSublTemp.swift")
+    os.remove(temp_file_path())
