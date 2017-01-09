@@ -45,6 +45,8 @@ def source_location_link(offset, file, project_directory, text):
 
 def _source_location_popup_section(file, project_directory, dictionary):
     href, relative_path_with_offset = _source_location_paths(file, project_directory, dictionary)
+    if href == "":
+        return ""
     value = "<a href=\"" + href + "\">" + relative_path_with_offset + "</a>"
     return _popup_section("Location", value)
 
@@ -53,7 +55,7 @@ def _source_location_paths(file, project_directory, dictionary):
     offset = _value_or_empty_string("key.offset", dictionary)
     length = _value_or_empty_string("key.length", dictionary)
     if filepath == "":
-        return ""
+        return ["", ""]
     offset = offset + 1
 
     # Current file
