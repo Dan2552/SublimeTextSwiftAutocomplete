@@ -35,7 +35,7 @@ class TestSourceKitten(unittest.TestCase):
     # When a variable is changed from what is persisted on the file system
     #
     # (i.e. test to ensure unsaved autocomplete is working ok)
-    def test_changed_code_on_unsaved(self):
+    def test_complete_changed_code_on_unsaved(self):
         offset = 162
         project_directory = path_helper.monkey_example_directory()
         file = project_directory + "/Monkey.swift"
@@ -55,7 +55,7 @@ class TestSourceKitten(unittest.TestCase):
     #
     # print("Eating the \(banana.co
     #                             ^
-    def test_midword(self):
+    def test_complete_midword(self):
         offset = 123
 
         project_directory = path_helper.monkey_example_directory()
@@ -72,8 +72,8 @@ class TestSourceKitten(unittest.TestCase):
     # struct Banana {
     #     let color: Strin
     #                    ^
-    def test_midword_type(self):
-        offset = 36
+    def test_complete_midword_type(self):
+        offset = 80
 
         project_directory = path_helper.monkey_example_directory()
         file = project_directory + "/Banana.swift"
@@ -90,7 +90,7 @@ class TestSourceKitten(unittest.TestCase):
         self.assertTrue(found_string_as_autocomplete)
 
     # Test project with spaces in subdirectory name
-    def test_spaced_project(self):
+    def test_complete_spaced_project(self):
         project_directory = path_helper.spaced_example_directory()
         file = ""
         text = "\"\"."
@@ -101,11 +101,11 @@ class TestSourceKitten(unittest.TestCase):
 
     # No assertions here, but a printout of how long it takes to autocomplete
     # with UIKit import
-    def test_performance(self):
+    def test_complete_performance(self):
         text = "import UIKit class Testing() { func aFunction() {  } }"
         offset = 50
         file = ""
-        project_directory = "/tmp/nowhere/"
+        project_directory = "/dev/null"
 
         start_time = int(round(time.time() * 1000))
         source_kitten.complete(offset, file, project_directory, text)
@@ -118,4 +118,33 @@ class TestSourceKitten(unittest.TestCase):
         end_time = int(round(time.time() * 1000))
 
         print("source_kitten.complete - Performance test (2nd): ", end_time - start_time, 'ms')
+
+    # Cursor popover
+    # eat(_ banana: Banana) {
+    #                 ^
+    def test_cursor_info(self):
+        offset = 78
+        project_directory = path_helper.monkey_example_directory()
+        file = project_directory + "/Monkey.swift"
+        text = file_contents_helper.read(file)
+
+        output = source_kitten.cursor_info(offset, file, project_directory, text)
+
+        self.assertEqual(output["key.name"], "Banana")
+        self.assertEqual(output["key.typename"], "Banana.Type")
+        self.assertEqual(output["key.filepath"], project_directory + "/Banana.swift")
+        self.assertEqual(output["key.offset"], 7)
+        self.assertEqual(output["key.length"], 6)
+
+    def test_cursor_info_unsaved(self):
+        offset = 31
+        project_directory = path_helper.monkey_example_directory()
+        file = project_directory + "/Monkey.swift"
+        text = file_contents_helper.read(file)
+        text = text.replace("consumedBananas", "consumedBananaz", 1)
+
+        output = source_kitten.cursor_info(offset, file, project_directory, text)
+
+        self.assertEqual(output["key.name"], "consumedBananaz")
+
 

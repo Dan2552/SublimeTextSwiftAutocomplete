@@ -3,29 +3,94 @@ from subprocess import Popen, PIPE, STDOUT
 import ijson
 import swift_project
 import functools
+import really_simple_yaml as yaml
+import os
 
+# Swift autocomplete. Calls `sourcekitten complete` with compiler argument
+#
+# - returns: A collection of suggestions
 def complete(offset, file, project_directory, text):
     calculated_offset = _calculate_source_kitten_compatible_offset(offset, text)
     text = _cut_calculated_offset_difference(offset, calculated_offset, text)
+    source_files = _source_files(file, project_directory)
 
     cmd = [
         "sourcekitten",
         "complete",
         "--text", text,
         "--offset", str(calculated_offset),
-        "--",
-        "-sdk", "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk",
-        "-target", "x86_64-apple-ios10.0"
-    ] + list(_source_files(file, project_directory))
+        "--"
+    ] + _sdk_and_target() + source_files
 
-    # Converting to a string and back is a little hack to let lru_cache work
-    output = _execute("§".join(cmd), _json_parse)
+    return _execute(cmd, _json_parse)
+
+# Cursor info. Calls sourcekitten to get details for what the cursor is
+# postioned on. E.g. to get info for the likes of when you hover over something
+# in Xcode
+#
+# For example, offset could point to "Banana" and the returned details would say
+# where the "Banana" class is defined
+#
+# Sourcekitten takes a command like the following:
+# ```
+# sourcekitten request --yaml 'key.request: source.request.cursorinfo
+# key.sourcefile: "/Users/dan2552/projects/SourceKittenSubl/test/data/MonkeyExample/Monkey.swift"
+# key.offset: 78
+# key.compilerargs:
+# - "-sdk"
+# - "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk"
+# - "-target"
+# - "x86_64-apple-ios10.0"
+# - "/Users/dan2552/projects/SourceKittenSubl/test/data/MonkeyExample/Monkey.swift"
+# - "/Users/dan2552/projects/SourceKittenSubl/test/data/MonkeyExample/Banana.swift"
+# ' 2>/dev/null
+# ```
+def cursor_info(offset, file, project_directory, text):
+    tmp_file = _create_temp_file(text)
+
+    source_files = _source_files(file, project_directory) + [tmp_file]
+    compilerargs = _sdk_and_target() + source_files
+
+    yaml_contents = \
+        yaml.generate_line("key.request", "source.request.cursorinfo") + \
+        yaml.generate_line("key.sourcefile", tmp_file, True) + \
+        yaml.generate_line("key.offset", offset) + \
+        yaml.generate_line("key.compilerargs", compilerargs, True) \
+
+    cmd = [
+        "sourcekitten",
+        "request",
+        "--yaml",
+        yaml_contents
+    ]
+
+    output = _execute(cmd, _json_parse)
+    _remove_temp_file()
     return output
 
-@functools.lru_cache(maxsize=None)
+def _sdk_and_target():
+    return [
+        "-sdk", _sdk(),
+        "-target", _target()
+    ]
+
+def _sdk():
+    return "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk"
+
+def _target():
+    return "x86_64-apple-ios10.0"
+
 def _execute(cmd, result_handler):
-    cmd = cmd.split("§")
-    with Popen(cmd, stdout=PIPE, stderr=STDOUT) as p:
+    # Converting to a string and back is a little hack to let lru_cache work
+    # as it only works on hashable arguments.
+    return _execute_cached("§§§".join(cmd), result_handler)
+
+@functools.lru_cache(maxsize=128)
+def _execute_cached(cmd, result_handler):
+    # print(cmd.replace("§§§", " "))
+    cmd = cmd.split("§§§")
+    with Popen(cmd, stdout=PIPE, stderr=PIPE) as p:
+        # print(p.stdout.peek())
         result = result_handler(p.stdout)
     return result
 
@@ -36,10 +101,11 @@ def _json_parse(stdout):
     except ijson.backends.python.UnexpectedSymbol:
         return []
 
-def _source_files(file, project_directory):
+def _source_files(file, project_directory, keep_original_file=None):
     source_files = swift_project.source_files(project_directory)
-    source_files = _filter_file_from_list(file, source_files)
-    return source_files
+    if keep_original_file != True:
+        source_files = _filter_file_from_list(file, source_files)
+    return list(source_files)
 
 # When a file is unsaved, you don't want the persisted file passed into
 # SourceKitten
@@ -85,3 +151,12 @@ def _cut_calculated_offset_difference(offset, calculated_offset, text):
     left = text[0:calculated_offset]
     right = text[offset:len(text)]
     return left + right
+
+def _create_temp_file(text):
+    path = "/tmp/SourceKittenSublTemp.swift"
+    with open(path, "w") as text_file:
+        text_file.write(text)
+    return path
+
+def _remove_temp_file():
+    os.remove("/tmp/SourceKittenSublTemp.swift")

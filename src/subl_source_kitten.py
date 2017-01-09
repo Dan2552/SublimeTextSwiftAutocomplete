@@ -1,8 +1,12 @@
 import source_kitten
 import re
 import itertools
+import sourcekit_xml_to_html
+import cgi
 
-# Returns a 2D array looking something like:
+# Swift autocomplete
+#
+# - returns: a 2D array looking something like:
 # [
 #   ["tree\tInt", "tree"],
 #   ["color\tBool", "color"],
@@ -11,6 +15,41 @@ import itertools
 def complete(offset, file, project_directory, text):
     collection = source_kitten.complete(offset, file, project_directory, text)
     return map(_subl_completion, collection)
+
+# Returns markdown, converted from source_kitten.cursor_info. In order to render
+# the markdown, it should be passed to the mdpopups dependency
+def popup(offset, file, project_directory, text):
+    output = source_kitten.cursor_info(offset, file, project_directory, text)
+
+    name_text = _popupSection("Name", "key.name", output)
+    type_text = _popupSection("Type", "key.typename", output)
+    group_text = _popupSection("Group", "key.groupname", output)
+
+    full_decl = _popupSection("Declaration", "key.doc.full_as_xml", output, True)
+    short_decl = _popupSection("Declaration", "key.annotated_decl", output, True)
+
+    declaration_text = full_decl
+    if len(short_decl) > len(full_decl):
+        declaration_text = short_decl
+
+    popup_text = name_text + type_text + declaration_text
+
+    return popup_text
+
+def _popupSection(title, key, dictionary, xml=None):
+    if not key in dictionary:
+        return ""
+    value = dictionary[key]
+    print("original:")
+    print(value)
+
+    if xml == True:
+        value = sourcekit_xml_to_html.to_html(value)
+    else:
+        value = "" + cgi.escape(value) + ""
+
+    value = "<span class='title'>" + title + "</span>" + "<div class='section'>" + value + "</div>"
+    return value
 
 # An item will look something like this:
 #
