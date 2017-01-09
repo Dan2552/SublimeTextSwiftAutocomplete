@@ -62,6 +62,11 @@ class SublCompletions(sublime_plugin.EventListener):
     def on_hide(self):
         pass
 
+class SourceKittenSublDocCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        point = self.view.sel()[0].begin()
+        SublCompletions().on_hover(self.view, point, sublime.HOVER_TEXT)
+
 def _project_directory(view):
     if len(view.window().folders()) > 0:
         return view.window().folders()[0]
