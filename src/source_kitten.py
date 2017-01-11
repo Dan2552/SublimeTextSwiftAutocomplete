@@ -19,7 +19,8 @@ def complete(offset, file, project_directory, text):
         "complete",
         "--text", text,
         "--offset", str(calculated_offset),
-        "--"
+        "--",
+        "-j8"
     ] + _sdk_and_target() + source_files
 
     return _execute(cmd, _json_parse)
@@ -83,7 +84,7 @@ def _sdk():
     return "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk"
 
 def _target():
-    return "x86_64-apple-ios10.0"
+    return "armv7-apple-ios10.0"
 
 def _execute(cmd, result_handler):
     # Converting to a string and back is a little hack to let lru_cache work
