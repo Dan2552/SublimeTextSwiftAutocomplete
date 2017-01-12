@@ -1,6 +1,11 @@
+import logging
 import subprocess
 from subprocess import Popen, PIPE, STDOUT
-import ijson
+try:
+    import ijson.backends.yajl2 as ijson
+except:
+    logging.warning("Failed to import yajl2 backend for ijson.")
+    import ijson
 import swift_project
 import functools
 import really_simple_yaml as yaml
