@@ -99,16 +99,18 @@ class TestSourceKitten(unittest.TestCase):
 
         self.assertTrue(len(output) > 0)
 
-    # No assertions here, but a printout of how long it takes to autocomplete
-    # with UIKit import
+    # Tests with UIKit import to check that it works
+    #
+    # Because it can be slow, also includes printout of how long it takes to autocomplete
+    # twice (so as to also test caching)
     def test_complete_performance(self):
-        text = "import UIKit class Testing() { func aFunction() {  } }"
-        offset = 50
+        text = "import UIKit; class Testing() { func aFunction() {  } }"
+        offset = 51
         file = ""
         project_directory = "/dev/null"
 
         start_time = int(round(time.time() * 1000))
-        source_kitten.complete(offset, file, project_directory, text)
+        output = source_kitten.complete(offset, file, project_directory, text)
         end_time = int(round(time.time() * 1000))
 
         print("source_kitten.complete - Performance test (1st): ", end_time - start_time, 'ms')
@@ -118,6 +120,10 @@ class TestSourceKitten(unittest.TestCase):
         end_time = int(round(time.time() * 1000))
 
         print("source_kitten.complete - Performance test (2nd): ", end_time - start_time, 'ms')
+
+        self.assertTrue(len(output) > 0)
+        ui_view_controller_entries = filter(lambda n: n["name"] == "UIViewController", output)
+        self.assertTrue(len(list(ui_view_controller_entries)) > 0)
 
     # Cursor popover
     # eat(_ banana: Banana) {

@@ -12,6 +12,7 @@ While it doesn't read Xcode project files, it currently works pretty well for me
 
 - Install SourceKitten (`brew install sourcekitten`)
 - Clone this repository to the Sublime packages directory
+- [Optionally for speed] Install a faster JSON parsing back-end: (`brew install yajl`)
 
 ## Usage
 
