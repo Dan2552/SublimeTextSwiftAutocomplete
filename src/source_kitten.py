@@ -10,6 +10,7 @@ import swift_project
 import functools
 import really_simple_yaml as yaml
 import os
+import time
 
 # Swift autocomplete. Calls `sourcekitten complete` with compiler argument
 #
@@ -98,16 +99,27 @@ def _execute(cmd, result_handler):
 
 @functools.lru_cache(maxsize=128)
 def _execute_cached(cmd, result_handler):
-    # print(cmd.replace("§§§", " "))
+    print(cmd.replace("§§§", " "))
     cmd = cmd.split("§§§")
     with Popen(cmd, stdout=PIPE, stderr=PIPE) as p:
-        # print(p.stdout.peek())
+        p.stdout.peek()
         result = result_handler(p.stdout)
     return result
 
 def _json_parse(stdout):
     try:
+        start_time = int(round(time.time() * 1000))
+
+        # stdout.peek()
+
+        end_time = int(round(time.time() * 1000))
+        print("peek - Performance test: ", end_time - start_time, 'ms')
+        start_time = int(round(time.time() * 1000))
         results = list(ijson.items(stdout,''))[0]
+
+        end_time = int(round(time.time() * 1000))
+        print("json parse - Performance test: ", end_time - start_time, 'ms')
+
         return results
     except ijson.backends.python.UnexpectedSymbol:
         return []
