@@ -3,6 +3,41 @@ import re
 import itertools
 import sourcekit_xml_to_html
 import cgi
+import threading
+import operator
+import time
+
+# Same as `.complete` but will try two autocompletions:
+# 1) as normal
+# 2) with all `import`s stripped - faster
+#
+# If (1) runs within a second, the returned result will use that. If not, the
+# result be the value of (2).
+def complete_with_haste(offset, file, project_directory, text):
+    results = {}
+
+    def repl(m):
+        return ' ' * len(m.group())
+    stripped_text = re.sub(r'^(\s?import \w+\s?)($|;)', repl, text, flags=re.MULTILINE)
+
+    full = lambda : operator.setitem(results, "full", complete(offset, file, project_directory, text))
+    stripped = lambda : operator.setitem(results, "stripped", complete(offset, file, project_directory, stripped_text))
+    second = lambda : time.sleep(1)
+    t1 = threading.Thread(target=full)
+    t2 = threading.Thread(target=stripped)
+    t3 = threading.Thread(target=second)
+    t1.start()
+    t2.start()
+    t3.start()
+
+    t2.join()
+    if not t1.is_alive():
+        return results["full"]
+    t3.join()
+    if not t1.is_alive():
+        return results["full"]
+    return results["stripped"]
+
 
 # Swift autocomplete
 #

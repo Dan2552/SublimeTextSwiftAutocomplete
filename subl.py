@@ -17,7 +17,7 @@ class SublCompletions(sublime_plugin.EventListener):
         offset = locations[0]
         project_directory = _project_directory(view)
         text = _view_text(view)
-        suggestions = subl_source_kitten.complete(offset, file, project_directory, text)
+        suggestions = subl_source_kitten.complete_with_haste(offset, file, project_directory, text)
         return (suggestions, sublime.INHIBIT_WORD_COMPLETIONS | sublime.INHIBIT_EXPLICIT_COMPLETIONS)
 
     def on_hover(self, view, point, hover_zone):
