@@ -14,7 +14,7 @@ While it doesn't read Xcode project files, it currently works pretty well for me
 - Clone this repository to the Sublime packages directory
 - [Optionally for speed] Install a faster JSON parsing back-end: (`brew install yajl`)
 
-## Usage
+## Usage
 
 - Open your project top-most directory in Sublime (e.g. `cd ~/projects/MyProject && subl .`)
 
