@@ -20,7 +20,7 @@ def complete(offset, file, project_directory, text):
     source_files = _source_files(file, project_directory)
 
     cmd = [
-        "sourcekitten",
+        _sourcekitten_path(),
         "complete",
         "--text", text,
         "--offset", str(calculated_offset),
@@ -64,7 +64,7 @@ def cursor_info(offset, file, project_directory, text):
         yaml.generate_line("key.compilerargs", compilerargs, True) \
 
     cmd = [
-        "sourcekitten",
+        _sourcekitten_path(),
         "request",
         "--yaml",
         yaml_contents
@@ -78,6 +78,13 @@ def cursor_info(offset, file, project_directory, text):
 # `.complete` function)
 def temp_file_path():
     return "/tmp/SourceKittenSublTemp.swift"
+
+def _sourcekitten_path():
+    file = "sourcekitten"
+    for path in os.environ["PATH"].split(os.pathsep):
+        if os.path.exists(os.path.join(path, file)):
+            return os.path.join(path, file)
+    return "/usr/local/bin/" + file
 
 def _sdk_and_target():
     return [

@@ -8,8 +8,14 @@ if [[ $files == "" ]]; then
   files="$(ls *_test.py | sed -e 's/\..*$//')"
 fi
 
-# Run
-python3 -m unittest helpers/test_helper.py $files
+python="$(which python3)"
+
+$python -m unittest helpers/test_helper.py $files
+
+if [[ $? == 0 ]]; then
+  # Test to check when PATH environment variable doesn't have SourceKitten
+  bash -c "PATH='/usr/bin' $python -m unittest helpers/test_helper.py source_kitten_test.TestSourceKitten.test_complete_simple source_kitten_test.TestSourceKitten.test_cursor_info"
+fi
 
 cd $script_dir
 
