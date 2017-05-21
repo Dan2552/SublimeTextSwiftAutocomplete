@@ -19,11 +19,13 @@ def complete(offset, file, project_directory, text):
     text = _cut_calculated_offset_difference(offset, calculated_offset, text)
     source_files = _source_files(file, project_directory)
 
+    offset_in_bytes = _calculate_offset_in_bytes(calculated_offset, text)
+
     cmd = [
         _sourcekitten_path(),
         "complete",
         "--text", text,
-        "--offset", str(calculated_offset),
+        "--offset", str(offset_in_bytes),
         "--",
         "-j8"
     ] + _sdk_and_target() + source_files
@@ -169,6 +171,9 @@ def _cut_calculated_offset_difference(offset, calculated_offset, text):
     left = text[0:calculated_offset]
     right = text[offset:len(text)]
     return left + right
+
+def _calculate_offset_in_bytes(length_offset, text):
+    return len(text[0:length_offset].encode('utf-8'))
 
 def _create_temp_file(text):
     path = temp_file_path()

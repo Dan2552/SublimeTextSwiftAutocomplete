@@ -153,4 +153,14 @@ class TestSourceKitten(unittest.TestCase):
 
         self.assertEqual(output["key.name"], "consumedBananaz")
 
+    # Issue raised by GitHub user @ccampbell
+    # https://github.com/Dan2552/SourceKittenSubl/issues/19
+    def test_copyright_symbol(self):
+        file = ""
+        text = "// ©©\nvar test = 10\ntest."
+        offset = len(text)
+        project_directory = "/dev/null"
+        output = source_kitten.complete(offset, file, project_directory, text)
 
+        self.assertTrue(len(list(output)) > 0)
+        self.assertEqual(output[0]['sourcetext'], "advanced(by: <#T##Int#>)")
