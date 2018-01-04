@@ -163,4 +163,3 @@ class TestSourceKitten(unittest.TestCase):
         output = source_kitten.complete(offset, file, project_directory, text)
 
         self.assertTrue(len(list(output)) > 0)
-        self.assertEqual(output[0]['sourcetext'], "advanced(by: <#T##Int#>)")

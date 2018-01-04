@@ -15,4 +15,4 @@ class TestSourceKitten(unittest.TestCase):
             project_directory + "/Monkey.swift"
         ]
 
-        self.assertEqual(list(output), expectation)
+        self.assertEqual(sorted(list(output)), sorted(expectation))
