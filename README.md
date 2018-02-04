@@ -10,7 +10,6 @@ Swift autocomplete and documentation in Sublime Text 3, using [SourceKitten](htt
 
 - Install SourceKitten (`brew install sourcekitten`)
 - Clone this repository to the Sublime packages directory
-- [Optionally for speed] Install a faster JSON parsing back-end: (`brew install yajl`)
 
 ## Usage
 

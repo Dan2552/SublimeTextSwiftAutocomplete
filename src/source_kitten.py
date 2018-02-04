@@ -1,12 +1,7 @@
 import logging
 import subprocess
 from subprocess import Popen, PIPE, STDOUT
-try:
-    import ijson.backends.yajl2 as ijson
-except:
-    logging.warning("Failed to import yajl2 backend for ijson.")
-    import ijson
-import swift_project
+import json
 import functools
 import really_simple_yaml as yaml
 import os
@@ -115,11 +110,8 @@ def _execute_cached(cmd, result_handler):
     return result
 
 def _json_parse(stdout):
-    try:
-        results = list(ijson.items(stdout,''))[0]
-        return results
-    except ijson.backends.python.UnexpectedSymbol:
-        return []
+    results = json.loads(str(stdout.read(), 'utf8'))
+    return results
 
 def _source_files(file, project_directory, keep_original_file=None):
     source_files = swift_project.source_files(project_directory)
