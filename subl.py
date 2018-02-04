@@ -1,10 +1,7 @@
-from .dependencies import dependencies
-dependencies.load()
-
 import sublime, sublime_plugin
 from sublime import Region
-import subl_source_kitten
 from threading import Timer
+from .src import subl_source_kitten
 
 # Sublime Text will will call `on_query_completions` itself
 class SublCompletions(sublime_plugin.EventListener):

@@ -1,7 +1,7 @@
-import source_kitten
+from . import source_kitten
+from . import sourcekit_xml_to_html
 import re
 import itertools
-import sourcekit_xml_to_html
 import cgi
 import threading
 import operator

@@ -1,7 +1,6 @@
+from src.xcode_project_reader import XcodeProjectReader
+from helpers import path_helper
 import unittest
-import xcode_project_reader
-import path_helper
-from xcode_project_reader import XcodeProjectReader
 
 class TestXcodeProjectReader(unittest.TestCase):
     def test_targets(self):

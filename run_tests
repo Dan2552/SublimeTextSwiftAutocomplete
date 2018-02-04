@@ -8,13 +8,31 @@ if [[ $files == "" ]]; then
   files="$(ls *_test.py | sed -e 's/\..*$//')"
 fi
 
-python="$(which python3)"
+pyenv=$(which pyenv)
 
-$python -m unittest helpers/test_helper.py $files
+if [[ $pyenv != "" ]]; then
+    eval "$(pyenv init -)"
+fi
+
+python="$(which python)"
+
+echo '-------'
+echo 'Note: Sublime Text uses Python 3.3'
+echo 'Current version:'
+$python --version
+echo '-------'
+
+if [[ $python == "" ]]; then
+    echo 'python not found in $PATH.'
+    exit 1
+fi
+
+export PYTHONPATH="$script_dir"
+$python -m unittest $files
 
 if [[ $? == 0 ]]; then
   # Test to check when PATH environment variable doesn't have SourceKitten
-  bash -c "PATH='/usr/bin' $python -m unittest helpers/test_helper.py source_kitten_test.TestSourceKitten.test_complete_simple source_kitten_test.TestSourceKitten.test_cursor_info"
+  bash -c "PATH='/bin:/usr/bin' $python -m unittest source_kitten_test.TestSourceKitten.test_complete_simple source_kitten_test.TestSourceKitten.test_cursor_info"
 fi
 
 cd $script_dir

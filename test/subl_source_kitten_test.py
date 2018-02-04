@@ -1,7 +1,7 @@
+from src import subl_source_kitten
+from helpers import file_contents_helper
+from helpers import path_helper
 import unittest
-import path_helper
-import subl_source_kitten
-import file_contents_helper
 import time
 
 class TestSublSourceKitten(unittest.TestCase):

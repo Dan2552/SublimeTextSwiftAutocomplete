@@ -1,6 +1,6 @@
+from src import swift_project
+from helpers import path_helper
 import unittest
-import path_helper
-import swift_project
 
 class TestSourceKitten(unittest.TestCase):
     # Test with a simple project directory

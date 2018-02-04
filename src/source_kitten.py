@@ -1,9 +1,10 @@
+from . import swift_project
+from . import really_simple_yaml as yaml
 import logging
 import subprocess
 from subprocess import Popen, PIPE, STDOUT
 import json
 import functools
-import really_simple_yaml as yaml
 import os
 
 # Swift autocomplete. Calls `sourcekitten complete` with compiler argument

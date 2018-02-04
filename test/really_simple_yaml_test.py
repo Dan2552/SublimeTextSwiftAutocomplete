@@ -1,5 +1,5 @@
 import unittest
-import really_simple_yaml as yaml
+from src import really_simple_yaml as yaml
 
 class TestReallySimpleYaml(unittest.TestCase):
     def test_generate_line_basic(self):

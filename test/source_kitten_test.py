@@ -1,7 +1,7 @@
+from src import source_kitten
+from helpers import path_helper
+from helpers import file_contents_helper
 import unittest
-import path_helper
-import file_contents_helper
-import source_kitten
 import time
 
 class TestSourceKitten(unittest.TestCase):
