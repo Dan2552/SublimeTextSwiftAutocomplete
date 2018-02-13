@@ -1,4 +1,4 @@
-# SourceKittenSubl
+# SublimeTextSwiftAutocomplete
 
 Swift autocomplete and documentation in Sublime Text 3, using [SourceKitten](https://github.com/jpsim/SourceKitten).
 
@@ -17,8 +17,8 @@ Swift autocomplete and documentation in Sublime Text 3, using [SourceKitten](htt
 
 ## Notes
 
-- SourceKittenSubl doesn't read Xcode project files, but instead uses the top-most directory open in Sublime.
-- The source of SourceKittenSubl is simple so hopefully it should be easy to contribute to (please do!). I'm open for discussion on the repository issues if you want to discuss / you're at all unsure how to approach a problem.
+- SublimeTextSwiftAutocomplete doesn't read Xcode project files, but instead uses the top-most directory open in Sublime.
+- The source of SublimeTextSwiftAutocomplete is simple so hopefully it should be easy to contribute to (please do!). I'm open for discussion on the repository issues if you want to discuss / you're at all unsure how to approach a problem.
 
 ## For contributing
 - Run the test runner: `./run_tests`
