@@ -102,6 +102,7 @@ def _sanitize(text):
     text = text.replace("<Discussion>", "")
     text = text.replace("</Discussion>", "")
     text = text.replace("<zCodeLineNumbered></zCodeLineNumbered>", "")
+    text = text.replace("..<", "..&lt;")
     return text
 
 # The output we get isn't always the best looking, so this function does some
