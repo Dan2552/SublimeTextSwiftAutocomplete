@@ -170,8 +170,11 @@ def _calculate_offset_in_bytes(length_offset, text):
 
 def _create_temp_file(text):
     path = temp_file_path()
-    with open(path, "w") as text_file:
-        text_file.write(text)
+
+    # To avoid ascii-conversion issues, we encode the file as a binary file containing utf-8 encoded text
+    with open(path, "wb") as text_file:
+        binData = bytes(text, encoding='utf-8', errors='ignore')
+        text_file.write(binData)
     return path
 
 def _remove_temp_file():
