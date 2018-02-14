@@ -9,7 +9,7 @@ from xml.etree import ElementTree
 xml_to_html_tags = {
     "Name"              : "strong",   "Abstract"          : "div",
     "Protocol"          : "div",      "InstanceMethod"    : "div",
-    "SeeAlsos"          : "div",      "Discussion"        : "span",
+    "SeeAlsos"          : "div",      "Discussion"        : "div",
     "Declaration"       : "div",      "Class"             : "div",
     "Note"              : "div",      "Para"              : "p",
     "SeeAlso"           : "p",        "Availability"      : "p",
@@ -26,7 +26,8 @@ xml_to_html_tags = {
     "Constant"          : "div",      "Parameter"         : "li",
     "Parameters"        : "ul",       "CodeListing"       : "div",
     "zCodeLineNumbered" : "span",     "emphasis"          : "em",
-    "Complexity"        : "div",      "USR"               : "span"
+    "Complexity"        : "div",      "USR"               : "span",
+    "Type"              : "span"
 }
 
 css = """
@@ -60,10 +61,28 @@ ul {
     background-color: color(var(--background) blend(var(--foreground) 85%));
 }
 
-.discussion, li p {
+.type {
+    background-color: color(var(--background) blend(var(--foreground) 85%));
+}
+
+.li p {
     padding: 0;
     margin: 0;
     display: inline;
+}
+
+.abstract {
+    color: #B5ABC5;
+    padding: 0;
+    margin: 0;
+    display: block;
+}
+
+.discussion {
+    color: #8D859B;
+    padding: 0;
+    margin: 0;
+    display: block;
 }
 </style>
 """
@@ -91,7 +110,7 @@ def to_html(xml):
 
     converted_xml = str(ElementTree.tostring(root, encoding="utf-8"), "utf-8")
 
-    return css + converted_xml
+    return converted_xml
 
 # Sublime Text minihtml is a bit delicate. So here we remove tags that prevent
 # it working as expected.
@@ -115,8 +134,6 @@ def _sanitize(text):
     text = text.replace("]]>", "")
     text = text.replace("<rawHTML>", "")
     text = text.replace("</rawHTML>", "")
-    text = text.replace("<Discussion>", "")
-    text = text.replace("</Discussion>", "")
     text = text.replace("<zCodeLineNumbered></zCodeLineNumbered>", "")
     text = text.replace("..<", "..&lt;")
     return text
@@ -126,4 +143,10 @@ def _sanitize(text):
 def _tweaks(text):
     text = text.replace("<Direction isExplicit=\"0\">in</Direction>", ": ")
     text = text.replace("<Parameters>", "Parameters:<Parameters>")
+
+    # Abstracts and Discussions tend to have a leading <Para>, which causes them
+    # to appear slightly offset from their label in the popup. We'll remove that
+    # leading <Para> here.
+    text = re.sub(r'<Abstract><Para>(.*?)</Para>', "<Abstract>\\1", text)
+    text = re.sub(r'<Discussion><Para>(.*?)</Para>', "<Discussion>\\1", text)
     return text
