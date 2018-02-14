@@ -2,6 +2,7 @@
 # https://github.com/johncsnyder/SwiftKitten/blob/13c32401f16f0e6abd6deb180a9f96c590c27c6a/SwiftKitten.py#L650
 # so special thanks to John Snyder for starting this
 
+import re
 import xml.etree
 from xml.etree import ElementTree
 
@@ -95,6 +96,21 @@ def to_html(xml):
 # Sublime Text minihtml is a bit delicate. So here we remove tags that prevent
 # it working as expected.
 def _sanitize(text):
+    # Sanitize the contents of CDATA elements. We do this before removing the
+    # CDATA tags.
+    #
+    # Example:
+    #
+    #     <![CDATA[        bytes: count * MemoryLayout<Point>.stride,]]>
+    #
+    # ...becomes...
+    #
+    #     <![CDATA[        bytes: count * MemoryLayout&lt;Point>.stride,]]>
+    #
+    # In English, this RE replaces all '<' characters with the string "&lt;"
+    # when they appear between the strings "![CDATA[" and "]]>".
+    text = re.sub(r'<(?=(?:(?!(?:!\[CDATA\[|]]>)).)*?\]\]>)', '&lt;', text)
+
     text = text.replace("<![CDATA[", "")
     text = text.replace("]]>", "")
     text = text.replace("<rawHTML>", "")
