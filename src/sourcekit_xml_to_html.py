@@ -15,7 +15,7 @@ xml_to_html_tags = {
     "SeeAlso"           : "p",        "Availability"      : "p",
     "zModuleImport"     : "p",        "zAttributes"       : "p",
     "Attribute"         : "p",        "uAPI"              : "a",
-    "codeVoice"         : "span",      "newTerm"           : "em",
+    "codeVoice"         : "span",     "newTerm"           : "em",
     "List-Bullet"       : "ul",       "Item"              : "li",
     "AvailabilityItem"  : "em",       "InstanceProperty"  : "div",
     "CodeListing"       : "div",      "reservedWord"      : "b",
@@ -37,6 +37,7 @@ css = """
 }
 
 .section {
+    color: #F0F0F0;
     padding-left: 8rem;
     padding-top: -1.3rem;
     padding-bottom: 10px;
@@ -72,14 +73,14 @@ ul {
 }
 
 .abstract {
-    color: #B5ABC5;
+    color: #E4DCC7;
     padding: 0;
     margin: 0;
     display: block;
 }
 
 .discussion {
-    color: #8D859B;
+    color: #C5BEAB;
     padding: 0;
     margin: 0;
     display: block;
