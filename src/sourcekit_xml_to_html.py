@@ -37,7 +37,6 @@ css = """
 }
 
 .section {
-    color: #F0F0F0;
     padding-left: 8rem;
     padding-top: -1.3rem;
     padding-bottom: 10px;
@@ -50,15 +49,18 @@ ul {
 }
 
 .zcodelinenumbered {
+    font-family: monospace;
     display: block;
 }
 
 .codelisting {
+    font-family: monospace;
     padding: 0.5rem;
     background-color: color(var(--background) blend(var(--foreground) 85%));
 }
 
 .codevoice {
+    font-family: monospace;
     background-color: color(var(--background) blend(var(--foreground) 85%));
 }
 
@@ -74,14 +76,14 @@ ul {
 
 .abstract {
     color: #E4DCC7;
-    padding: 0;
+    padding-top: -1rem;
     margin: 0;
     display: block;
 }
 
 .discussion {
     color: #C5BEAB;
-    padding: 0;
+    padding-top: -1rem;
     margin: 0;
     display: block;
 }
@@ -129,14 +131,22 @@ def _sanitize(text):
     #
     # In English, this RE replaces all '<' characters with the string "&lt;"
     # when they appear between the strings "![CDATA[" and "]]>".
-    text = re.sub(r'<(?=(?:(?!(?:!\[CDATA\[|]]>)).)*?\]\]>)', '&lt;', text)
+    text = re.sub(r'<(?=(?:(?!(?:!\[CDATA\[|]]>)).)*?]]>)', '&lt;', text)
 
     text = text.replace("<![CDATA[", "")
     text = text.replace("]]>", "")
     text = text.replace("<rawHTML>", "")
     text = text.replace("</rawHTML>", "")
     text = text.replace("<zCodeLineNumbered></zCodeLineNumbered>", "")
-    text = text.replace("..<", "..&lt;")
+
+    # This was causing problems in cases where lines contained "...do something..."
+    #text = text.replace("..<", "..&lt;")
+
+    # Since Sublime's minihtml doesn't support preformatted text, we fake spaces
+    # and tabs by using a NO-BREAK SPACE character (Unicode: U+00A0).
+    text = re.sub(r'\t(?=(?:(?!(?:zCodeLineNumbered>|</zCodeLineNumbered>)).)*?</zCodeLineNumbered>)', u'\xA0\xA0\xA0\xA0', text)
+    text = re.sub(r' (?=(?:(?!(?:zCodeLineNumbered>|</zCodeLineNumbered>)).)*?</zCodeLineNumbered>)', u'\xA0', text)
+
     return text
 
 # The output we get isn't always the best looking, so this function does some
@@ -145,9 +155,4 @@ def _tweaks(text):
     text = text.replace("<Direction isExplicit=\"0\">in</Direction>", ": ")
     text = text.replace("<Parameters>", "Parameters:<Parameters>")
 
-    # Abstracts and Discussions tend to have a leading <Para>, which causes them
-    # to appear slightly offset from their label in the popup. We'll remove that
-    # leading <Para> here.
-    text = re.sub(r'<Abstract><Para>(.*?)</Para>', "<Abstract>\\1", text)
-    text = re.sub(r'<Discussion><Para>(.*?)</Para>', "<Discussion>\\1", text)
     return text
