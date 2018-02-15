@@ -118,7 +118,6 @@ def to_html(xml):
 # Sublime Text minihtml is a bit delicate. So here we remove tags that prevent
 # it working as expected.
 def _sanitize(text):
-    print(text)
     # Sanitize the contents of CDATA elements. We do this before removing the
     # CDATA tags.
     #
