@@ -31,6 +31,10 @@ class SublCompletions(sublime_plugin.EventListener):
 
         text = subl_source_kitten.popup(point, file, project_directory, text)
 
+        # If we don't have any content, don't bother showing a popup
+        if text == "":
+            return
+
         view.show_popup(text,
                         sublime.HIDE_ON_MOUSE_MOVE_AWAY,
                         point,
@@ -77,6 +81,22 @@ class SourceKittenSublJumpToDefinitionCommand(sublime_plugin.TextCommand):
         instance.on_navigate(href)
 
 def _project_directory(view):
+    # Get the setting 'stsa.project_root' and use that, if it exists. The value stored in
+    # this setting honors ST3's variable expansion (see sublime.expand_variables() for more
+    # information.)
+    #
+    # Generally, you would want to put this into the project settings. Here is an example
+    # that specifies the subdirectory 'code' under your Sublime project's root directory:
+    #
+    #     "settings":
+    #     {
+    #         "stsa.project_root": "${project_path:${folder}}/code"
+    #     }
+    dir = view.settings().get("stsa.project_root")
+    if dir != None and type(dir) is str:
+        return sublime.expand_variables(dir, view.window().extract_variables())
+
+    # Fall back to using the top-most directory open in Sublime
     if len(view.window().folders()) > 0:
         return view.window().folders()[0]
     return ""

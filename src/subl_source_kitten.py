@@ -60,8 +60,14 @@ def popup(offset, file, project_directory, text):
     type_text = _popup_section_from_dict("Type", "key.typename", output)
     group_text = _popup_section_from_dict("Group", "key.groupname", output)
 
-    full_decl = _popup_section_from_dict("Declaration", "key.doc.full_as_xml", output, True)
+    full_decl = _popup_section_from_dict("Declaration", "key.doc.full_as_xml", output, True, r'.*?(<Declaration[^>]*?>.*?</Declaration>).*?', r'<CommentParts>.*?</CommentParts>')
     short_decl = _popup_section_from_dict("Declaration", "key.annotated_decl", output, True)
+
+    # Generate html for the <Abstract> section of the xml
+    abstract = _popup_section_from_dict("Abstract", "key.doc.full_as_xml", output, True, r'.*?(<Abstract[^>]*?>.*?</Abstract>).*?')
+
+    # Generate html for the <Discussion> section of the xml
+    discussion = _popup_section_from_dict("Discussion", "key.doc.full_as_xml", output, True, r'.*?(<Discussion[^>]*?>.*?</Discussion>).*?')
 
     source_loc_text = _source_location_popup_section(file, project_directory, output)
 
@@ -69,9 +75,14 @@ def popup(offset, file, project_directory, text):
     if len(short_decl) > len(full_decl):
         declaration_text = short_decl
 
-    popup_text = name_text + type_text + source_loc_text + declaration_text
+    popup_text = name_text + type_text + source_loc_text + declaration_text + abstract + discussion
 
-    return popup_text
+    # If we don't have any content, return an empty string
+    if popup_text == "":
+        return ""
+
+    # Return the content prefixed by the CSS
+    return sourcekit_xml_to_html.css + popup_text
 
 def source_location_link(offset, file, project_directory, text):
     dictionary = source_kitten.cursor_info(offset, file, project_directory, text)
@@ -103,13 +114,28 @@ def _source_location_paths(file, project_directory, dictionary):
     href = absolute_path_with_offset + "-" + str(length)
     return [href, relative_path_with_offset]
 
-def _popup_section_from_dict(title, key, dictionary, xml=None):
+# If tag_filter is set, then it is used in a regex match, where the first match
+# is used as the section of XML to convert to HTML.
+#
+# If wipe_filter is set, then it is used as a regex replace with a blank string. This
+# Allows for specific tags to be filtered, but to remove contents within those tags
+# as needed. This operation is performed after tag_filter.
+def _popup_section_from_dict(title, key, dictionary, xml=None, tag_filter=None, wipe_filter=None):
     value = _value_or_empty_string(key, dictionary)
 
     if value == "":
         return ""
 
     if xml == True:
+        if tag_filter != None:
+            m = re.match(tag_filter, value)
+            value = ""
+            if m != None:
+                value = m.group(1)
+        if wipe_filter != None:
+            value = re.sub(wipe_filter, "", value)
+        if value == "":
+            return value
         value = sourcekit_xml_to_html.to_html(value)
     else:
         value = "" + cgi.escape(value) + ""
