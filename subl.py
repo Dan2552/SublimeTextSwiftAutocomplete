@@ -31,6 +31,10 @@ class SublCompletions(sublime_plugin.EventListener):
 
         text = subl_source_kitten.popup(point, file, project_directory, text)
 
+        # If we don't have any content, don't bother showing a popup
+        if text == "":
+            return
+
         view.show_popup(text,
                         sublime.HIDE_ON_MOUSE_MOVE_AWAY,
                         point,

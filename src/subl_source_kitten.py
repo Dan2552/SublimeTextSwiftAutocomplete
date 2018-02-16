@@ -77,9 +77,9 @@ def popup(offset, file, project_directory, text):
 
     popup_text = name_text + type_text + source_loc_text + declaration_text + abstract + discussion
 
-    # If we don't have any content, let the user know we're here and working but there wasn't any info
+    # If we don't have any content, return an empty string
     if popup_text == "":
-        popup_text = "No information found"
+        return ""
 
     # Return the content prefixed by the CSS
     return sourcekit_xml_to_html.css + popup_text
