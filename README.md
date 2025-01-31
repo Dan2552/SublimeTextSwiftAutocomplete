@@ -1,3 +1,6 @@
+> [!WARNING]
+> This probably hasn't worked for years :) don't bother trying
+
 # SublimeTextSwiftAutocomplete
 
 Swift autocomplete and documentation in Sublime Text 3, using [SourceKitten](https://github.com/jpsim/SourceKitten).
